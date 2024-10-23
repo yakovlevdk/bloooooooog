@@ -14,6 +14,7 @@ const PostFormContainer = ({
 }) => {
 	const [imageUrlValue, setImageUrlValue] = useState(imageUrl);
 	const [titleValue, setTitleValue] = useState(title);
+	const [savePostValidateError, setSavePostValidateError ] = useState(null)
 	const contentRef = useRef(null);
 
 	useLayoutEffect(() => {
@@ -26,14 +27,19 @@ const PostFormContainer = ({
 
 	const onSave = () => {
 		const newContent = sanizeContent(contentRef.current.innerHTML);
+		if ( imageUrlValue &&  titleValue && newContent) {
+			setSavePostValidateError(null)
+			dispatch(
+				savePostAsync(id, {
+					imageUrl: imageUrlValue,
+					title: titleValue,
+					content: newContent,
+				}),
+			).then(({ id }) => navigate(`/post/${id}`));
+		} else {
+			setSavePostValidateError('Заполните все поля!')
+		}
 
-		dispatch(
-			savePostAsync(id, {
-				imageUrl: imageUrlValue,
-				title: titleValue,
-				content: newContent,
-			}),
-		).then(({ id }) => navigate(`/post/${id}`));
 	};
 
 	const onImageChange = ({ target }) => setImageUrlValue(target.value);
@@ -72,6 +78,9 @@ const PostFormContainer = ({
 			>
 				{content}
 			</div>
+		{	savePostValidateError && (
+<span>{savePostValidateError}</span>
+			)}
 		</div>
 	);
 };

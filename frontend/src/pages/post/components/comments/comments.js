@@ -12,10 +12,16 @@ const CommentsContainer = ({ className, comments, postId }) => {
 	const [newComment, setNewComment] = useState('');
 	const userRole = useSelector(selectUserRole);
 	const dispatch = useDispatch();
-
+const [addCommentError, setAddCommentError] = useState('')
 	const onNewCommentAdd = (postId, content) => {
-		dispatch(addCommentAsync(postId, content));
-		setNewComment('');
+		if( content) {
+			setAddCommentError(null)
+			dispatch(addCommentAsync(postId, content));
+			setNewComment('');
+		} else {
+			setAddCommentError('Комментарий не может быть пустым.')
+		}
+
 	};
 
 	const isGuest = userRole === ROLE.GUEST;
@@ -36,8 +42,12 @@ const CommentsContainer = ({ className, comments, postId }) => {
 						size="18px"
 						onClick={() => onNewCommentAdd(postId, newComment)}
 					/>
+
 				</div>
 			)}
+			{addCommentError && (
+						<span>{addCommentError}</span>
+					)}
 			<div className="comments">
 				{comments.map(({ id, author, content, publishedAt }) => (
 					<Comment
